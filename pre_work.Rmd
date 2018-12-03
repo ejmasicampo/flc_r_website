@@ -25,6 +25,60 @@ ggplot(iris, aes(Species, Sepal.Length))+
 
 ## Session 3
 
+###Follow-up work###
+Here I describe the follow-up work I did for Session 3 wherein I imported a data set using rio(), practiced creating visualisations of that data set with ggplot(), documented those efforts using R Markdown, and published that documentation to my Github website.
+
+First, I loaded the tidyverse and rio packages for managing and importing data into R. 
+
+```{r}
+library(tidyverse)
+library(rio)
+```
+
+Then I imported my data set. In this data set, I explore belief in harmless wrongs (i.e. the belief that certain
+behaviors are immoral even if they do not harm) in a sample of users of the website Amazon Mechanical Turk. I tested what proportion of people believe in harmless wrongs or, alternatively, believe that behaviors are only wrong insofar as they cause harm. I also askedpeople who belive in harmless wrongs to provide an example of a harmless wrong, and I measured various perceptions of those harmless wrongs (immoral participants thought those behvaiors were, how indicative those behaviors were of poor moral character, etc.)
+
+```{r}
+HarmlessWrongs <- import("Study175bDatasav.sav")
+```
+
+
+After importing the dataset, I checked the data set using the head() function. 
+
+```{r}
+head(HarmlessWrongs, 10)
+```
+
+I am interested in why people consider harmless wrongs to be immoral. If these behaviors cause no harm, then what is
+unethical about them? 
+
+In my data set, I asked people who believe in harmless wrongs to supply an example of a harmless wrong. I also asked these people to indicate precisely how immoral they considered that behavior to be (1 = not at all; 7 = very), and I asked people to rate the behavior on several other dimensions. One of those dimensions was the degree to which participants view the behavior as indicative of poor moral character (1 = not at all; 7 = very much so). 
+
+I am interested whether harmless wrongs are perceived as wrong because they are indicative of poor moral character. Therefore, I created a scatterplot of the relationship between perceptions of harmless wrongs as indicating poor moral character (on the X axis) and perceptions of harmless wrongs as immoral (on the Y axis). I used ggplot's geom_point() geometry.  
+
+```{r}
+ggplot (HarmlessWrongs, aes(x = HWpoorcharacter, y = HWHowImmoral)) + geom_point()
+```
+
+One limitation of the above visualization is that it does not depict the large numbers of participants with identical responses. Therefore, I created a second visualization using as my geometric object geom_count(). 
+
+```{r}
+ggplot (HarmlessWrongs, aes(x = HWpoorcharacter, y = HWHowImmoral)) + geom_count()
+```
+
+I also created a box plot visualization. 
+
+```{r}
+ggplot (HarmlessWrongs, aes(x = factor(HWpoorcharacter), y = HWHowImmoral)) + geom_boxplot()
+```
+
+And I created a violin plot visualization. 
+
+```{r}
+ggplot (HarmlessWrongs, aes(x = factor(HWpoorcharacter), y = HWHowImmoral)) + geom_violin()
+```
+
+
 ## Session 4
 
 ## Session 5
