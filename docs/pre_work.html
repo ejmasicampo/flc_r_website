@@ -329,7 +329,7 @@ div.tocify {
 <pre class="r"><code>library(ggplot2)
 ggplot(iris, aes(Species, Sepal.Length))+
   geom_col()</code></pre>
-<p><img src="pre_work_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="pre_work_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
 <div id="session-2" class="section level2">
 <h2>Session 2</h2>
@@ -355,16 +355,16 @@ library(rio)</code></pre>
 <p>In my data set, I asked people who believe in harmless wrongs to supply an example of a harmless wrong. I also asked these people to indicate precisely how immoral they considered that behavior to be (1 = not at all; 7 = very), and I asked people to rate the behavior on several other dimensions. One of those dimensions was the degree to which participants view the behavior as indicative of poor moral character (1 = not at all; 7 = very much so).</p>
 <p>I am interested whether harmless wrongs are perceived as wrong because they are indicative of poor moral character. Therefore, I created a scatterplot of the relationship between perceptions of harmless wrongs as indicating poor moral character (on the X axis) and perceptions of harmless wrongs as immoral (on the Y axis). I used ggplot’s geom_point() geometry.</p>
 <pre class="r"><code>ggplot (HarmlessWrongs, aes(x = HWpoorcharacter, y = HWHowImmoral)) + geom_point()</code></pre>
-<p><img src="pre_work_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="pre_work_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>One limitation of the above visualization is that it does not depict the large numbers of participants with identical responses. Therefore, I created a second visualization using as my geometric object geom_count().</p>
 <pre class="r"><code>ggplot (HarmlessWrongs, aes(x = HWpoorcharacter, y = HWHowImmoral)) + geom_count()</code></pre>
-<p><img src="pre_work_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="pre_work_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>I also created a box plot visualization.</p>
 <pre class="r"><code>ggplot (HarmlessWrongs, aes(x = factor(HWpoorcharacter), y = HWHowImmoral)) + geom_boxplot()</code></pre>
-<p><img src="pre_work_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="pre_work_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>And I created a violin plot visualization.</p>
 <pre class="r"><code>ggplot (HarmlessWrongs, aes(x = factor(HWpoorcharacter), y = HWHowImmoral)) + geom_violin()</code></pre>
-<p><img src="pre_work_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="pre_work_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
 </div>
 <div id="session-4" class="section level2">
