@@ -16,6 +16,29 @@ You can detail what you learned in the session within these pages. You can also 
 # Session 3
 
 # Session 4
+##What will my data look like?
+I'm interested in how internally motivated students are to do well in their courses. If they are internally motivated, then they are motivated by the view that the course is fun and/or that it is personally important. If they are externally motivated, then their efforts in the course are motivated by the fact that they _have_ to do well in the course (i.e. they are being presured or coerced into doing well in the course). 
+
+I will be measuring people's internal motivation at various time points throughout the semester. I will also be measuring how well they think they are doing in the course at each time point. I hypothesize that people will tend to become less internally motivated throughout the course of the semester and that this change will be mediated by how well people think they are doing in the course, such that as students begin to struggle in the course, their motivated shifts away from being internal to being more external. 
+
+My data will be a series of Qualtrics surveys that students will complete every 2 to 3 weeks throughout the semester. Each Qualtrics survey will contain three or four variables: student ID, student motivation (measured via 1 to 2 questions), and perceptions of course performance. 
+
+##Tidying my data
+I will need to combine the surveys I receive at each time point. I'm not sure how to do this yet! And once the data are combined, I will need to organize in the following way to make tidy:
+Variables: Participant ID, time point (1 through n), motivation rating, performance rating
+
+It would be nice to write my R code so that I do not have to amend it at all each time I add a new time point. Apparently this is possible. Mike mentioned that there is a QualtRics R package that can be used to import data (using an API token) automatically from Qualtrics into R so that I will not have change my Rmarkdown code after each additional time point. 
+
+To get the necessary codes for the above: After logging into Qualtrics, go to my icon in the upper right, go to account settings, then go to Qualtrics IDs. That will be where my API token is and where my survey codes are. 
+
+Mike showed me this website that descibes some of the functions of the qualtRics package: https://github.com/ropensci/qualtRics
+
+As some follow-up work, I may try importing my harmless wrongs data set directly from Qualtrics using the qualtRics package. 
+
+NOTE from Mike: If I want to post this process on my website, I will need to hide my Qualtircs API token within my r profile.
+
+###Other misc notes###
+If I have missing data represented by the number 99, I can use dplyr's na_if() function to specify which values to consider missing data. For example: na_if(99)
 
 # Session 5
 
