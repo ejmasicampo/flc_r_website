@@ -81,6 +81,24 @@ ggplot (HarmlessWrongs, aes(x = factor(HWpoorcharacter), y = HWHowImmoral)) + ge
 
 ## Session 4
 
+First, I installed and loaded the qualtRics package. 
+
+```{r}
+install.packages("devtools")
+devtools::install_github("ropensci/qualtRics")
+```
+
+```{r}
+library(qualtRics)
+```
+
+Then I registered my Qualtrics credentials. (I assigned my Qualtrics API token as the value of QualtricsAPIToken within .rprofile to keep it hidden here.)
+
+```{r}
+registerOptions(api_token="QualtricsAPIToken", base_url="wakeforest.ca1.qualtrics.com")
+```
+
+
 ## Session 5
 
 ## Session 6
