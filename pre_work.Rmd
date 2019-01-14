@@ -81,10 +81,12 @@ ggplot (HarmlessWrongs, aes(x = factor(HWpoorcharacter), y = HWHowImmoral)) + ge
 
 ## Session 4
 
+For my follow-up work to Session 4, I worked on the code for importing data directly from Qualtrics using the qualtRics package. I will be collecting data in Qualtrics over multiple time points and thus would like automate the process of downloading and analyzing those data as they come in. 
+
 First, I installed and loaded the qualtRics package. 
 
 ```{r}
-install.packages("devtools")
+install.packages("devtools", repos = "http://cran.us.r-project.org")
 devtools::install_github("ropensci/qualtRics")
 ```
 
@@ -92,12 +94,26 @@ devtools::install_github("ropensci/qualtRics")
 library(qualtRics)
 ```
 
-Then I registered my Qualtrics credentials. (I assigned my Qualtrics API token as the value of QualtricsAPIToken within .rprofile to keep it hidden here.)
+Then I registered my Qualtrics credentials. (I assigned my Qualtrics API token as the value of QualtricsAPIToken within .rprofile to keep it hidden here.) I also told R not to use the labels but rather to use values for survey responses.
 
 ```{r}
-registerOptions(api_token="QualtricsAPIToken", base_url="wakeforest.ca1.qualtrics.com")
+registerOptions(api_token = QualtricsAPIToken, base_url="wakeforest.ca1.qualtrics.com")
+registerOptions(useLabels = FALSE)
 ```
 
+I think imported the Harmless Wrongs data set directly from Qualtrics using the getSurvey() function. 
+
+```{r}
+HarmlessWrongsfromQualtrics <- getSurvey(surveyID = "SV_8IbGxs0unkqqERv", includeQuestionIds = c("HWHowImmoral", "HWpoorcharacter"))
+```
+
+I then checked the data set using the head() function. 
+
+```{r}
+head(HarmlessWrongsfromQualtrics, 10)
+```
+
+I am now able to retrieve data directly from Qualtrics, which will be useful for my SOTL project this semester. I will be asking my students to complete Qualtrics surveys every other week for the entire semester. I hope to write some R code that will download, analyze, and create a report from those data and that I can (re)run at any point in the semester. 
 
 ## Session 5
 
