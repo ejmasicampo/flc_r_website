@@ -117,6 +117,8 @@ I am now able to retrieve data directly from Qualtrics, which will be useful for
 
 ## Session 5
 
+Following session 5, I met with a statistics consultant to learn how to set up my data properly for using a multi-level model for analyzing my data. I am feeling good about having a proper, tidy format to work toward. I have also collected more data from my class. And now that I am ready to start combining spreadsheets into a single, master data frame to analyze, I'm realizing one issue -- I need to anonymize my data set. At each time point in my study, students are completing a Qualtrics survey in which they are entering their Wake Forest user names. I want to replace these user names with pseudo-randomly generated numbers that I can then use to link their responses across surveys. I am not sure yet of the best way to do this!
+
 ## Session 6
 
 ## Session 7
