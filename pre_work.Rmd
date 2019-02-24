@@ -38,14 +38,14 @@ library(rio)
 Then I imported my data set. In this data set, I explore belief in harmless wrongs (i.e. the belief that certain
 behaviors are immoral even if they do not harm) in a sample of users of the website Amazon Mechanical Turk. I tested what proportion of people believe in harmless wrongs or, alternatively, believe that behaviors are only wrong insofar as they cause harm. I also askedpeople who belive in harmless wrongs to provide an example of a harmless wrong, and I measured various perceptions of those harmless wrongs (immoral participants thought those behvaiors were, how indicative those behaviors were of poor moral character, etc.)
 
-```{r}
+```{r importdatasetlocally}
 HarmlessWrongs <- import("Study175bDatasav.sav")
 ```
 
 
 After importing the dataset, I checked the data set using the head() function. 
 
-```{r}
+```{r checkdataframelocal}
 head(HarmlessWrongs, 10)
 ```
 
@@ -56,13 +56,13 @@ In my data set, I asked people who believe in harmless wrongs to supply an examp
 
 I am interested whether harmless wrongs are perceived as wrong because they are indicative of poor moral character. Therefore, I created a scatterplot of the relationship between perceptions of harmless wrongs as indicating poor moral character (on the X axis) and perceptions of harmless wrongs as immoral (on the Y axis). I used ggplot's geom_point() geometry.  
 
-```{r}
+```{r visualize}
 ggplot (HarmlessWrongs, aes(x = HWpoorcharacter, y = HWHowImmoral)) + geom_point()
 ```
 
-One limitation of the above visualization is that it does not depict the large numbers of participants with identical responses. Therefore, I created a second visualization using as my geometric object geom_count(). 
+One limitation of the above visualization is that it does not depict the large numbers of participants with identical responses. Therefore, I created a second visualization using as my geometric object geom_co1 forunt(). 
 
-```{r}
+```{r visualizewithgeomcount}
 ggplot (HarmlessWrongs, aes(x = HWpoorcharacter, y = HWHowImmoral)) + geom_count()
 ```
 
@@ -85,31 +85,43 @@ For my follow-up work to Session 4, I worked on the code for importing data dire
 
 First, I installed and loaded the qualtRics package. 
 
-```{r}
-install.packages("devtools", repos = "http://cran.us.r-project.org")
-devtools::install_github("ropensci/qualtRics")
+```{r eval=FALSE}
+install.packages("remotes")
+remotes::install_github("ropensci/qualtRics")
 ```
 
-```{r}
+```{r loadlibraries}
 library(qualtRics)
 ```
 
 Then I registered my Qualtrics credentials. (I assigned my Qualtrics API token as the value of QualtricsAPIToken within .rprofile to keep it hidden here.) I also told R not to use the labels but rather to use values for survey responses.
 
-```{r}
-registerOptions(api_token = QualtricsAPIToken, base_url="wakeforest.ca1.qualtrics.com")
-registerOptions(useLabels = FALSE)
+```{r eval=FALSE}
+
+qualtrics_api_credentials(api_key = QualtricsAPIToken, 
+                          base_url = "wakeforest.ca1.qualtrics.com",
+                          install = TRUE)
+
 ```
 
-I think imported the Harmless Wrongs data set directly from Qualtrics using the getSurvey() function. 
+Apparently then running this code reloads the environment to enable using the credentials without restarting R. 
 
-```{r}
+```{r eval=FALSE}
+
+readRenviron("~/.Renviron")
+
+```
+
+
+I then imported the Harmless Wrongs data set directly from Qualtrics using the getSurvey() function. 
+
+```{r getsurveyfromQualtrics}
 HarmlessWrongsfromQualtrics <- getSurvey(surveyID = "SV_8IbGxs0unkqqERv", includeQuestionIds = c("HWHowImmoral", "HWpoorcharacter"))
 ```
 
 I then checked the data set using the head() function. 
 
-```{r}
+```{r checkdataframefromqualtrics}
 head(HarmlessWrongsfromQualtrics, 10)
 ```
 
