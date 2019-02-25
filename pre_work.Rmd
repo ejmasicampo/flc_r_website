@@ -133,6 +133,55 @@ Following session 5, I met with a statistics consultant to learn how to set up m
 
 ## Session 6
 
+Following session 6, I completed data collection for my first three time points. Again, every two weeks, I am surveying my students to gauge their motivations for doing well in the class. I am also measuring various classroom perceptions and experiences as potential predictors of changes in motivation. With three time points collected, I have enough data to start writing code to wrangle the data into a tidy dataset for conducting a multi-level model to see what predicts changes in motivation over time. 
+
+First, I imported the three data sets from Qualtrics using the qualtRics package. 
+
+```{r importT1toT3fromQualtrics}
+
+library(qualtRics)
+TimePoint1 <- getSurvey(surveyID = "SV_bjyUQzDIYvIC9sF", startDate = "2019-01-17", endDate = "2019-01-20", useLabels = FALSE)
+TimePoint2 <- getSurvey(surveyID = "SV_784VMn6ZTQHld3f", startDate = "2019-01-31", endDate = "2019-02-03", useLabels = FALSE)
+TimePoint3 <- getSurvey(surveyID = "SV_0xIjxfcFeBWERxP", startDate = "2019-02-12", endDate = "2019-02-17", useLabels = FALSE)
+
+```
+
+Next, I added a variable to each data frame labeling it with its appropriate time point.  
+```{r}
+TimePoint1$TimePoint <- 1
+TimePoint2$TimePoint <- 2
+TimePoint3$TimePoint <- 3
+```
+
+Then I combined the data frames from each time point into a master data frame, but selecting only the variables of interest. 
+
+```{r}
+listOfTimePointDFs <- list(TimePoint1, TimePoint2, TimePoint3)
+CompiledClassroomMotivationDataset <- do.call(rbind, lapply(listOfTimePointDFs, subset, select=c("WFUUsername", "HowChallenging","DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "TimePoint")))
+```
+
+Some students included "@wfu.edu" or "@wfu" in their WFUUsernames even though instructed not to. So I deleted such text from the data frame. 
+
+```{r}
+CompiledClassroomMotivationDataset$WFUUsername <- gsub("@wfu.edu", "", CompiledClassroomMotivationDataset$WFUUsername, ignore.case=TRUE)
+CompiledClassroomMotivationDataset$WFUUsername <- gsub("@wfu", "", CompiledClassroomMotivationDataset$WFUUsername, ignore.case=TRUE)
+```
+
+```{r echo=FALSE}
+CompiledClassroomMotivationDataset$WFUUsername <- gsub("Ludan Gbaye", "gbayl16", CompiledClassroomMotivationDataset$WFUUsername, ignore.case=TRUE)
+CompiledClassroomMotivationDataset$WFUUsername <- gsub("06527481", "markrc17", CompiledClassroomMotivationDataset$WFUUsername)
+
+```
+
+I then calculated an autonomous motivation score from participants' responses. This is the main dependent variable in the study. It is a composite of four ratings that captures the degree to which people are pursuing a goal (in this case, doing well in the course) for themselves (i.e. because they want to do well and value doing well) rather than for external causes. 
+
+```{r}
+CompiledClassroomMotivationDataset$AutonomousMotivation <- ((CompiledClassroomMotivationDataset$Motivation_3 + CompiledClassroomMotivationDataset$Motivation_4) - (CompiledClassroomMotivationDataset$Motivation_1 + CompiledClassroomMotivationDataset$Motivation_2))
+```
+
+To do: 
+I still need to anonymize the data set by replacing students' WFU usernames with numerical codes. I will then be ready to analyze my data using the lme4 package. 
+
 ## Session 7
 
 ## Session 8

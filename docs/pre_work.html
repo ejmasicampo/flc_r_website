@@ -402,6 +402,40 @@ remotes::install_github(&quot;ropensci/qualtRics&quot;)</code></pre>
 </div>
 <div id="session-6" class="section level2">
 <h2>Session 6</h2>
+<p>Following session 6, I completed data collection for my first three time points. Again, every two weeks, I am surveying my students to gauge their motivations for doing well in the class. I am also measuring various classroom perceptions and experiences as potential predictors of changes in motivation. With three time points collected, I have enough data to start writing code to wrangle the data into a tidy dataset for conducting a multi-level model to see what predicts changes in motivation over time.</p>
+<p>First, I imported the three data sets from Qualtrics using the qualtRics package.</p>
+<pre class="r"><code>library(qualtRics)
+TimePoint1 &lt;- getSurvey(surveyID = &quot;SV_bjyUQzDIYvIC9sF&quot;, startDate = &quot;2019-01-17&quot;, endDate = &quot;2019-01-20&quot;, useLabels = FALSE)</code></pre>
+<pre><code>## 
+  |                                                                       
+  |                                                                 |   0%
+  |                                                                       
+  |=================================================================| 100%</code></pre>
+<pre class="r"><code>TimePoint2 &lt;- getSurvey(surveyID = &quot;SV_784VMn6ZTQHld3f&quot;, startDate = &quot;2019-01-31&quot;, endDate = &quot;2019-02-03&quot;, useLabels = FALSE)</code></pre>
+<pre><code>## 
+  |                                                                       
+  |                                                                 |   0%
+  |                                                                       
+  |=================================================================| 100%</code></pre>
+<pre class="r"><code>TimePoint3 &lt;- getSurvey(surveyID = &quot;SV_0xIjxfcFeBWERxP&quot;, startDate = &quot;2019-02-12&quot;, endDate = &quot;2019-02-17&quot;, useLabels = FALSE)</code></pre>
+<pre><code>## 
+  |                                                                       
+  |                                                                 |   0%
+  |                                                                       
+  |=================================================================| 100%</code></pre>
+<p>Next, I added a variable to each data frame labeling it with its appropriate time point.</p>
+<pre class="r"><code>TimePoint1$TimePoint &lt;- 1
+TimePoint2$TimePoint &lt;- 2
+TimePoint3$TimePoint &lt;- 3</code></pre>
+<p>Then I combined the data frames from each time point into a master data frame, but selecting only the variables of interest.</p>
+<pre class="r"><code>listOfTimePointDFs &lt;- list(TimePoint1, TimePoint2, TimePoint3)
+CompiledClassroomMotivationDataset &lt;- do.call(rbind, lapply(listOfTimePointDFs, subset, select=c(&quot;WFUUsername&quot;, &quot;HowChallenging&quot;,&quot;DoWell&quot;, &quot;ActiveParticipant&quot;, &quot;BigPicture&quot;, &quot;GoodRapport&quot;, &quot;Motivation_1&quot;, &quot;Motivation_2&quot;, &quot;Motivation_3&quot;, &quot;Motivation_4&quot;, &quot;TimePoint&quot;)))</code></pre>
+<p>Some students included “<span class="citation">(<span class="citeproc-not-found" data-reference-id="wfu.edu"><strong>???</strong></span>)</span>” or “<span class="citation">(<span class="citeproc-not-found" data-reference-id="wfu"><strong>???</strong></span>)</span>” in their WFUUsernames even though instructed not to. So I deleted such text from the data frame.</p>
+<pre class="r"><code>CompiledClassroomMotivationDataset$WFUUsername &lt;- gsub(&quot;@wfu.edu&quot;, &quot;&quot;, CompiledClassroomMotivationDataset$WFUUsername, ignore.case=TRUE)
+CompiledClassroomMotivationDataset$WFUUsername &lt;- gsub(&quot;@wfu&quot;, &quot;&quot;, CompiledClassroomMotivationDataset$WFUUsername, ignore.case=TRUE)</code></pre>
+<p>I then calculated an autonomous motivation score from participants’ responses. This is the main dependent variable in the study. It is a composite of four ratings that captures the degree to which people are pursuing a goal (in this case, doing well in the course) for themselves (i.e. because they want to do well and value doing well) rather than for external causes.</p>
+<pre class="r"><code>CompiledClassroomMotivationDataset$AutonomousMotivation &lt;- ((CompiledClassroomMotivationDataset$Motivation_3 + CompiledClassroomMotivationDataset$Motivation_4) - (CompiledClassroomMotivationDataset$Motivation_1 + CompiledClassroomMotivationDataset$Motivation_2))</code></pre>
+<p>To do: I still need to anonymize the data set by replacing students’ WFU usernames with numerical codes. I will then be ready to analyze my data using the lme4 package.</p>
 </div>
 <div id="session-7" class="section level2">
 <h2>Session 7</h2>
