@@ -184,6 +184,13 @@ I still need to anonymize the data set by replacing students' WFU usernames with
 
 ## Session 7
 
+I realized that I want to do some time-lagged analyses in my project, meaning I want to test whether students' motivations at one time point are predicted by their perceptions and experiences of the course at the most recent time point (or, vice versa, whether students' experiences and perceptions at one time point are predicted by their motivations at the most recent time point). To do this, I need to add data to my data frame. Currently, each row in the data frame contains participants' responses during a single time point. I need to include in each row participants' responses at the most recent time point as well. 
+
+```{r}
+
+```
+
+
 ## Session 8
 
 ----

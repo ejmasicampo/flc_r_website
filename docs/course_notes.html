@@ -323,15 +323,6 @@ div.tocify {
 
 
 <p>You can detail what you learned in the session within these pages. You can also use the Rmd markdown language and insert code chunks with <code>CMD/CTRL + SHIFT + I</code>.</p>
-<div id="session-1" class="section level1">
-<h1>Session 1</h1>
-</div>
-<div id="session-2" class="section level1">
-<h1>Session 2</h1>
-</div>
-<div id="session-3" class="section level1">
-<h1>Session 3</h1>
-</div>
 <div id="session-4" class="section level1">
 <h1>Session 4</h1>
 <div id="what-will-my-data-look-like" class="section level2">
@@ -364,11 +355,41 @@ div.tocify {
 <p>-Combining various spreadsheets into a single, tidy dataframe - will need to work on the R code for this</p>
 <p>-Conducting a multi-level model analysis - have never done this before in R or elsewhere</p>
 </div>
-<div id="session-6" class="section level1">
-<h1>Session 6</h1>
-</div>
 <div id="session-7" class="section level1">
 <h1>Session 7</h1>
+<p>Jerid walked us through the analyzr package: <a href="https://wfu-tlc.github.io/analyzr" class="uri">https://wfu-tlc.github.io/analyzr</a></p>
+<p>I installed analyzr</p>
+<pre class="r"><code>library(devtools)
+devtools::install_github(&quot;WFU-TLC/analyzr&quot;)
+library(analyzr)</code></pre>
+<p>I then looked at the sbc (Santa Barbara Corpus of Spoken American English) data set, using the glimpse function.</p>
+<pre class="r"><code>glimpse(sbc)</code></pre>
+<pre><code>## Observations: 15,475
+## Variables: 13
+## $ id              &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
+## $ name            &lt;chr&gt; &quot;lenore&quot;, &quot;lenore&quot;, &quot;lenore&quot;, &quot;lenore&quot;, &quot;lenor...
+## $ gender          &lt;chr&gt; &quot;female&quot;, &quot;female&quot;, &quot;female&quot;, &quot;female&quot;, &quot;femal...
+## $ age             &lt;dbl&gt; 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30...
+## $ dialect         &lt;chr&gt; &quot;Los Angeles&quot;, &quot;Los Angeles&quot;, &quot;Los Angeles&quot;, &quot;...
+## $ dialect_state   &lt;chr&gt; &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;...
+## $ current_state   &lt;chr&gt; &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;, &quot;CA&quot;...
+## $ highest_edu     &lt;chr&gt; &quot;BA&quot;, &quot;BA&quot;, &quot;BA&quot;, &quot;BA&quot;, &quot;BA&quot;, &quot;BA&quot;, &quot;BA&quot;, &quot;BA&quot;...
+## $ years_edu       &lt;dbl&gt; 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16...
+## $ occupation      &lt;chr&gt; &quot;student&quot;, &quot;student&quot;, &quot;student&quot;, &quot;student&quot;, &quot;s...
+## $ ethnicity       &lt;chr&gt; &quot;white&quot;, &quot;white&quot;, &quot;white&quot;, &quot;white&quot;, &quot;white&quot;, &quot;...
+## $ utterance       &lt;chr&gt; &quot;... So you don&#39;t need to go ... borrow equipm...
+## $ utterance_clean &lt;chr&gt; &quot;so you don&#39;t need to go borrow equipment from...</code></pre>
+<p>Jerid walked us through selecting specific variables and only those rows with complete data</p>
+<pre class="r"><code>sbc &lt;- sbc %&gt;% select(id, name, gender, age, years_edu, utterance_clean)
+sbc &lt;- sbc[complete.cases(sbc), ]</code></pre>
+<p>Related to the above, Mike mentioned the tidy way of doing this (i.e. selecting only complete cases) via filter complete cases.</p>
+<p>Isolating DV:</p>
+<pre class="r"><code>sbc &lt;- 
+  sbc %&gt;% 
+  mutate(um = str_count(utterance_clean, &quot;\\b(um|u=m)\\b&quot;)) %&gt;% 
+  mutate(uh = str_count(utterance_clean, &quot;\\b(uh|u=h)\\b&quot;))</code></pre>
+<p>The \b represents a word boundary (could be a comma, space, etc.) Allows for elongated uhs and ums.</p>
+<p>Jerid then walkes us through visualizing and then testing the significance of various relationships in the sbc data set.</p>
 </div>
 <div id="session-8" class="section level1">
 <h1>Session 8</h1>

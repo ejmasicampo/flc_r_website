@@ -9,12 +9,6 @@ biblio-style: apalike
 
 You can detail what you learned in the session within these pages. You can also use the Rmd markdown language and insert code chunks with `CMD/CTRL + SHIFT + I`.
 
-# Session 1
-
-# Session 2
-
-# Session 3
-
 # Session 4
 ##What will my data look like?
 I'm interested in how internally motivated students are to do well in their courses. If they are internally motivated, then they are motivated by the view that the course is fun and/or that it is personally important. If they are externally motivated, then their efforts in the course are motivated by the fact that they _have_ to do well in the course (i.e. they are being presured or coerced into doing well in the course). 
@@ -57,10 +51,45 @@ As we move toward working on our individual projects, here is a list of things I
 -Conducting a multi-level model analysis - have never done this before in R or elsewhere
 
 
-
-# Session 6
-
 # Session 7
+
+Jerid walked us through the analyzr package: 
+https://wfu-tlc.github.io/analyzr
+
+I installed analyzr
+
+```{r}
+library(devtools)
+devtools::install_github("WFU-TLC/analyzr")
+library(analyzr)
+```
+
+
+I then looked at the sbc (Santa Barbara Corpus of Spoken American English) data set, using the glimpse function. 
+
+```{r}
+glimpse(sbc)
+```
+
+Jerid walked us through selecting specific variables and only those rows with complete data
+```{r}
+sbc <- sbc %>% select(id, name, gender, age, years_edu, utterance_clean)
+sbc <- sbc[complete.cases(sbc), ]
+```
+
+Related to the above, Mike mentioned the tidy way of doing this (i.e. selecting only complete cases) via filter complete cases. 
+
+Isolating DV: 
+```{r}
+sbc <- 
+  sbc %>% 
+  mutate(um = str_count(utterance_clean, "\\b(um|u=m)\\b")) %>% 
+  mutate(uh = str_count(utterance_clean, "\\b(uh|u=h)\\b"))
+```
+The \\b represents a word boundary (could be a comma, space, etc.)
+Allows for elongated uhs and ums. 
+
+Jerid then walkes us through visualizing and then testing the significance of various relationships in the sbc data set. 
 
 # Session 8
 
