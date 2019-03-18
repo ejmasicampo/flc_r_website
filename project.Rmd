@@ -1,28 +1,151 @@
 ---
 title: "Project"
 bibliography: library.bib
+indent: yes
 biblio-style: apalike
 ---
 
 ```{r, child="_setup.Rmd"}
 ```
 
-# Abstract
+```{r echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(qualtRics)
+library(lme4)
+library(lmerTest)
+library(analyzr)
+library(rio)
 
-# Introduction
+TimePoint1 <- getSurvey(surveyID = "SV_bjyUQzDIYvIC9sF", startDate = "2019-01-17", endDate = "2019-01-20", useLabels = FALSE)
+TimePoint2 <- getSurvey(surveyID = "SV_784VMn6ZTQHld3f", startDate = "2019-01-31", endDate = "2019-02-03", useLabels = FALSE)
+TimePoint3 <- getSurvey(surveyID = "SV_0xIjxfcFeBWERxP", startDate = "2019-02-12", endDate = "2019-02-17", useLabels = FALSE)
+TimePoint4 <- getSurvey(surveyID = "SV_9FCm3FWnPMRr445", startDate = "2019-02-28", endDate = "2019-03-03", useLabels = FALSE)
 
-# Literature Review
+TimePoint1$WFUUsername <- gsub("@wfu.edu", "", TimePoint1$WFUUsername, ignore.case=TRUE)
+TimePoint1$WFUUsername <- gsub("@wfu", "", TimePoint1$WFUUsername, ignore.case=TRUE)
+TimePoint2$WFUUsername <- gsub("@wfu.edu", "", TimePoint2$WFUUsername, ignore.case=TRUE)
+TimePoint2$WFUUsername <- gsub("@wfu", "", TimePoint2$WFUUsername, ignore.case=TRUE)
+TimePoint3$WFUUsername <- gsub("@wfu.edu", "", TimePoint3$WFUUsername, ignore.case=TRUE)
+TimePoint3$WFUUsername <- gsub("@wfu", "", TimePoint3$WFUUsername, ignore.case=TRUE)
+TimePoint4$WFUUsername <- gsub("@wfu.edu", "", TimePoint4$WFUUsername, ignore.case=TRUE)
+TimePoint4$WFUUsername <- gsub("@wfu", "", TimePoint4$WFUUsername, ignore.case=TRUE)
 
-# Methodology
+TimePoint2$WFUUsername <- gsub("Ludan Gbaye", "gbayl16", TimePoint2$WFUUsername, ignore.case=TRUE)
+TimePoint2$WFUUsername <- gsub("06527481", "markrc17", TimePoint2$WFUUsername)
+TimePoint4$WFUUsername <- gsub("06507825", "bergak16", TimePoint4$WFUUsername)
 
-## Data
+TimePoint1$WFUUsername <- tolower(TimePoint1$WFUUsername)
+TimePoint2$WFUUsername <- tolower(TimePoint2$WFUUsername)
+TimePoint3$WFUUsername <- tolower(TimePoint3$WFUUsername)
+TimePoint4$WFUUsername <- tolower(TimePoint4$WFUUsername)
 
-## Analysis
+TimePoint1$AutonomousMotivation <- ((TimePoint1$Motivation_3 + TimePoint1$Motivation_4) - (TimePoint1$Motivation_1 + TimePoint1$Motivation_2))
+TimePoint2$AutonomousMotivation <- ((TimePoint2$Motivation_3 + TimePoint2$Motivation_4) - (TimePoint2$Motivation_1 + TimePoint2$Motivation_2))
+TimePoint3$AutonomousMotivation <- ((TimePoint3$Motivation_3 + TimePoint3$Motivation_4) - (TimePoint3$Motivation_1 + TimePoint3$Motivation_2))
+TimePoint4$AutonomousMotivation <- ((TimePoint4$Motivation_3 + TimePoint4$Motivation_4) - (TimePoint4$Motivation_1 + TimePoint4$Motivation_2))
 
-# Results
+TimePoint1 <- subset(TimePoint1, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+TimePoint2 <- subset(TimePoint2, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+TimePoint3 <- subset(TimePoint3, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+TimePoint4 <- subset(TimePoint4, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
 
-# Discussion
+LastTimePointNames <- c("WFUUsername", "HowChallengingLastTimePoint", "DoWellLastTimePoint", "ActiveParticipantLastTimePoint", "BigPictureLastTimePoint", "GoodRapportLastTimePoint", "Motivation_1LastTimePoint", "Motivation_2LastTimePoint", "Motivation_3LastTimePoint", "Motivation_4LastTimePoint", "AutonomousMotivationLastTimePoint")
+TimePoint2LastWeek <- subset(TimePoint1, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+names(TimePoint2LastWeek) <- LastTimePointNames
+TimePoint3LastWeek <- subset(TimePoint2, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+names(TimePoint3LastWeek) <- LastTimePointNames
+TimePoint4LastWeek <- subset(TimePoint3, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+names(TimePoint4LastWeek) <- LastTimePointNames
 
-# Conclusion
+TimePoint2 <- left_join(TimePoint2, TimePoint2LastWeek)
+TimePoint3 <- left_join(TimePoint3, TimePoint3LastWeek)
+TimePoint4 <- left_join(TimePoint4, TimePoint4LastWeek)
 
-# References
+TimePoint1$TimePoint <- 1
+TimePoint2$TimePoint <- 2
+TimePoint3$TimePoint <- 3
+TimePoint4$TimePoint <- 4
+
+CompiledClassroomMotivationDatasetWithLaggedData <- do.call("rbind", list(TimePoint2, TimePoint3, TimePoint4))
+
+listOfTimePointDFs <- list(TimePoint1, TimePoint2, TimePoint3, TimePoint4)
+CompiledClassroomMotivationDataset <- do.call(rbind, lapply(listOfTimePointDFs, subset, select=c("WFUUsername", "HowChallenging","DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation", "TimePoint")))
+
+CompiledClassroomMotivationDataset <- left_join(CompiledClassroomMotivationDataset, CompiledClassroomMotivationDataset %>% select(WFUUsername) %>% unique() %>% mutate(ParticipantID=row_number()))
+CompiledClassroomMotivationDataset$WFUUsername <- NULL
+
+CompiledClassroomMotivationDatasetWithLaggedData <- left_join(CompiledClassroomMotivationDatasetWithLaggedData, CompiledClassroomMotivationDatasetWithLaggedData %>% select(WFUUsername) %>% unique() %>% mutate(ParticipantID=row_number()))
+CompiledClassroomMotivationDatasetWithLaggedData$WFUUsername <- NULL
+```
+
+
+<center>
+__Tracking Autonomous Motivation in a Classroom Over Time__  
+</center>
+  Students learn the best when they *want* to learn. Indeed, it is essentially a truism that motivated students will work harder and learn more than their less motivated counterparts.  Crucially, the factors undlying people's motivations matter too. On the one hand, students may be motivated to do well in the classroom so as to avoid punishment from their parents or to maintain a particular GPA, reflecting a more *controlled* motivation. On the other hand, students may be motivated to do well because they deeply believe in the importance of the material they are learning or else because they find the material to be fascinating, reflecting a more *autonomous* motivation. A large literature in psychology supports the notion that autonomous motivation is far more beneficial for achievement and well-being than is controlled motivation. The aim of the present work is to explore within a naturalistic classroom setting what predicts students' endorsement of autonomous versus controlled motivations to perform well in the class. 
+  
+**Autonomous verus Controlled Motivation**  
+  The distinction between autonomous and controlled motivation has its roots in Self-Determination Theory (SDT). Autonomous motivation originates within the self and comprises primarily of two types. First, autonomous motivation can involve pursuit of a task or goal for reasons of interest or enjoyment, as when people play games for fun or read books to satisfy their curiosity. Second, autonomous motivation can involve pursuit of a task or goal due to its congruence with one's internalized values and beliefs. People who engage in political protests via risky behaviors (e.g., going on a hunger strike), for example, are often motivated by deeply held moral convictions. Controlled motivation, in contrast, originates outside of the self and also comprises primarily of two types. First, controlled motivation can involve pursuing a task or goal due to some internalized social pressure, as when a person feels obligated to maintain a nice yard and does to to avoid the guilt or shame that would result otherwise. Second, controlled motivation can involve pursuing a task or goal due to outside pressure, coercion, or seduction, as when a person engages in some behavior to avoid punishment or to attain some reward.  
+  
+  Whether people are motivated by more autonomous versus controlled reasons has profound implications. People are more likely to succeed when pursuing a goal for autonomous reasons than for controlled ones. Moreover, when people are pursuing autonomous goals rather than controlled ones, they typically work more creatively and are better problem solvers. How goal pursuit is experienced also varies as a function of its underlying motives. When pursuing autonomously motivated (vs. controlled) goals, people are more invigorated, less fatigued, and happier. Moreover, people whose daily pursuits tend to involve more autonomously motivated goals than controlled ones report greater mental well-being and physical health than do people whose pursuits are more controlled. To pursue goals for autonomous reasons thus appears to be linked to a wide range of positive outcomes. 
+  
+**Fostering Autonomy**. Ample research has examined the various ways in which people can foster autonomy in others. There are three major ways that people can do this. First, people can foster autonomy by making a task more enjoyable. If a task can be made more fun or more interesting, then people will be more autonomously motivated to do it. Second, people can foster autonomy by making a task more valuable. If people can be shown that a task is congruent with their deeply held values and beliefs, then people will be more autonomously motivated to do it. Third, people can foster the degree to which one can exercise their personal preferences in how they pursue the task. If people are able to make choices for how they pursue a task, it will feel more autonomous. 
+
+<center>
+**The Present Project**  
+</center>
+  In the present project, I will track students' autonomous motivations in a classroom over time. Specifically, I am tracking psychology majors' and minors' autonomous motivations in a research methods and statistics class. I am also tracking students' classroom experiences, looking specifically at experiences that have the potential to be linked to felt autonomy. My aims in this project are to gain a better understanding of how students' motivations change in my research methods class over time, the experiences in that class that are associated with motivation change, and perhaps the experiences that are associated with autonomous motivation change in general. An additional aim is to carry out this project using R with the help of the Faculty Learning Community on SOTL and R, thereby creating in myself a new skillset and knowledge base to apply in future projects. 
+
+**Measuring Autonomous Motivation and Classroom Experiences**  
+  I am measuring autonomous motivation with a standard measure used in the literature. The measure asks people to what extent they are pursuing a goal for some external purpose (e.g., to gain a reward or avoid some punishment), to avoid negative emotions associated with failing to meet obligations, due to internalized values and beliefs, or due to intrinsic interest and enjoyment. To the degree that people are motivated by the latter two reasons, they are more autonomously motivated.  
+  
+  I am also measuring various classroom experiences that I suspect may be linked to the degree to which people's motivations are more autonomous versus controlled. First, I will be measuring students' *perceived difficulty* of the class and to what extent students think they can do well in the course (i.e. their *self-efficacy*). As students begin to struggle in a class, they may become more focused on potential negative outcomes (e.g, of disappointing their parents or failing to meet obligations), and this may be associated with becoming more controlled in their motivation.   Second, I am measuring students' *perceived involvement* in the course. That is, I will am measuring to what extent students feel like active participants in the class. To the extent that students feel like they are contributing to the class -- bringing their own ideas, preferences, and decisions to the classroom experience -- they may feel more autonomously motivated.  
+  
+  Third, I am measuring the degree to which students' *big picture appreciation* for the course content. This is the degree to which students report see the value and importance of the classroom content and exercises. If students are able to see the value in what we do in class, then they may be more autonomously motivated.  
+  
+  Last, I am also measuring students' *classroom rapport*, which is the degree to which students' report a sense of social belongingness in the class. If students feel like they belong in the class, then this may make them enjoy and value the class more, and this in turn may be linked to being more autonomously motivated to do well in the class. 
+  I am measuring the above classroom experiences not only because I have reason to suspect they could be linked to felt autonomy but also because I strive actively to increase these experiences in the classroom. Much of my communication in the classroom is aimed at encouraging students' self-efficacy. I also often reach out to individual students who are struggling in the class with the goal of helping them to learn the material as well as encouraging them to feel as though they can succeed in the course. I also include many activities in the classroom and in lab sections to encourage perceived involvement.I try to make as many aspects of the course as possible (e.g., assignments, exercises, papers, in-class examples) reflect students' own preferences and interests. In addition, I try to encourage a big picture appreciation of the course content by regularly returning to the overarching themes in the course and providing ongoing summaries that link together all we've done thus far in the class. Finally, I foster classroom rapport via activities done in small groups and as lab sections.  
+  
+  Thus, in the present project, I am measuring students' motivations and the five classroom experiences described above: perceived difficulty, self-efficacy, perceived involvement, big picture appreciation, and classroom rapport. I measured each of these during the first week of class and am measuring them again every other week thereafter until the end of the semester.
+**Classroom Selection**  
+  I have decided to carry out this project in my research methods and statistics class because it is a challenging class in which students typically struggle and where I suspect students tend not to be as autonomously motivated as they are in other psychology classes. As described above, it is also a class in which I expend a lot of effort encouraging autonomy in the classroom, with the aim of improving student engagement and performance. The present project will allow me to test to what extent students do tend adopt more controlled rather than autonomous motivations in the clasroom and what sorts of classroom experiences are linked to students' motivations. This is a uniqiue class, and it is not clear whether the patterns observed within it will generalize to other classes. However, if I do ultimately measure similar experiences and motivations in other classes, then this project could serve as an initial test of the more general patterns that capture student motivations in the classroom in higher education. 
+**Use of R**  
+  I am carrying out all aspects of this project using R. This includes importing my data via R, wrangling my data in R, conducting all data analyses and visualizations in R, and producing the present write-up in R. I  had very little experience with R prior to this project. Therefore, completing the current project in R will serve as a space in which to practice and learn doing all aspects of a research project in R. The hope is to learn enough about R so that I can continue to use R in future teaching and research projects, allowing for more flexible and reproducible work in both arenas. 
+
+<center>
+**Method**  
+</center>
+**Participants**  
+  Participants are 68 students enrolled in a class on research methods and statistics in psychology during the spring 2019 semester. All students are psychology majors or minors, ranging from sophomores to seniors. 
+**Materials**  
+  The project involves just a single questionnaire with several items. First, students answer five questions about their experiences in the course. They indicate how challenging they think the course is overall (*perceived difficulty*), how confident they are that they can do well in the couse (*self-efficacy*), how much they currently feel like an active participant in the course (*perceived involvement*), to what extent class meetings are helping them to see the big picture relevance of what they are learning (*big picture appreciation*), and to what extent they feel like they have a good rapport with others in the class (*classroom rapport*). Each of these items is answered on a 1 (*not at all*) to 7 (*very much*) scale.  
+  
+  Second, students answer four questions aimed at measuring their motivation in terms of how autonomous versus controlled it is. Specifically, students are asked to indicate why doing well in the course is important to them. They are presented with four reasons: "Because somebody else wants them to, or because the situation seems to compel it," "Because I would feel ashamed, anxious, or guilty if I didn't," "Because I really believe that it's important to," and "Because of the enjoyment or stimulation that the course bring." Participants rated each item on a 1 (*Not at all because of this reason*) to 7 (*Completely because of this reason*) scale.  
+**Procedure**  
+  All students completed the questionnaire during the first week of class and is completing it again each other week until the end of the semester. Students receive a link to the questionnaire via e-mail on the Thursday of each week and are asked to complete it by the end of Saturday. The questionnaire is hosted on the Qualtrics website. As of March 18th, 2019, students have completed the questionnaire at four different time points.  
+
+<center>
+**Results**  
+</center>
+  I conducted all data analyses in R, using the ggplot2 and lme4 packages for data visualization and mixed effects model analyses, respectively. For each student at each time point, I calculated an autonomous motivation score. I did this by summing the third and fourth items in the autonomous motivation measure and subtracting from that the sum of the first and second items.  
+  
+  I first analyzed changes in students' class perceptions and autonomous motivations over time. I did this using a series of mixed effects models with students as a random factor and time as a fixed factor. Results revealed a significant relationship between time and perceived difficulty, beta = .336, *t*(160.84) = 6.00, *p* < .001, such that students' perceived the class to be more difficult over time. See Figure 1. 
+
+Figure 1. Perceived difficulty over time  
+```{r echo=FALSE}
+library(ggplot2)
+ggplot (CompiledClassroomMotivationDataset, aes(x = factor(TimePoint), y = HowChallenging)) + geom_violin()
+```
+*Note*. The above violin plot shows the distributions of students' perceived difficulty ratings across the first four time points. 
+
+None of the other classroom perceptions (self-efficacy, perceived involvement, big picture appreciation, and good rapport) varied significantly across time, all |betas| < .079, all |ts| < 1.47, ps > .144. Autonomous motivation, however, did also change significantly over time, beta = -.6236, *t*(153.51) = -4.930, *p* < .0001, such that it became lower across time points. 
+```{r echo=FALSE}
+ggplot (CompiledClassroomMotivationDataset, aes(x = factor(TimePoint), y = AutonomousMotivation)) + geom_violin()
+```
+
+<center>
+**Discussion**  
+</center>
+  
