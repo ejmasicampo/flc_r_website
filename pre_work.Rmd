@@ -8,6 +8,16 @@ biblio-style: apalike
 ```
 
 We can use this space to go ahead and write out any exercise or prework that you would like have done prior to coming.
+```{r echo=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(qualtRics)
+library(lme4)
+library(lmerTest)
+library(analyzr)
+library(rio)
+```
+
 
 ## Session 1
 
@@ -131,18 +141,85 @@ I am now able to retrieve data directly from Qualtrics, which will be useful for
 
 Following session 5, I met with a statistics consultant to learn how to set up my data properly for using a multi-level model for analyzing my data. I am feeling good about having a proper, tidy format to work toward. I have also collected more data from my class. And now that I am ready to start combining spreadsheets into a single, master data frame to analyze, I'm realizing one issue -- I need to anonymize my data set. At each time point in my study, students are completing a Qualtrics survey in which they are entering their Wake Forest user names. I want to replace these user names with pseudo-randomly generated numbers that I can then use to link their responses across surveys. I am not sure yet of the best way to do this!
 
-## Session 6
+## Session 6 throuh 8
 
-Following session 6, I completed data collection for my first three time points. Again, every two weeks, I am surveying my students to gauge their motivations for doing well in the class. I am also measuring various classroom perceptions and experiences as potential predictors of changes in motivation. With three time points collected, I have enough data to start writing code to wrangle the data into a tidy dataset for conducting a multi-level model to see what predicts changes in motivation over time. 
+Every two weeks, I am surveying my students to gauge their motivations for doing well in the class. I am also measuring various classroom perceptions and experiences as potential predictors of changes in motivation. I have enough data to start writing code to wrangle the data into a tidy dataset for conducting a multi-level model to see what predicts changes in motivation over time. 
 
-First, I imported the three data sets from Qualtrics using the qualtRics package. 
+First, I imported the data sets from Qualtrics using the qualtRics package. 
 
-```{r importT1toT3fromQualtrics}
+```{r importT1toT4fromQualtrics}
 
 library(qualtRics)
 TimePoint1 <- getSurvey(surveyID = "SV_bjyUQzDIYvIC9sF", startDate = "2019-01-17", endDate = "2019-01-20", useLabels = FALSE)
 TimePoint2 <- getSurvey(surveyID = "SV_784VMn6ZTQHld3f", startDate = "2019-01-31", endDate = "2019-02-03", useLabels = FALSE)
 TimePoint3 <- getSurvey(surveyID = "SV_0xIjxfcFeBWERxP", startDate = "2019-02-12", endDate = "2019-02-17", useLabels = FALSE)
+TimePoint4 <- getSurvey(surveyID = "SV_9FCm3FWnPMRr445", startDate = "2019-02-28", endDate = "2019-03-03", useLabels = FALSE)
+```
+
+
+Some students included "@wfu.edu" or "@wfu" in their WFUUsernames even though instructed not to. So I deleted such text from each data frame.
+
+```{r}
+TimePoint1$WFUUsername <- gsub("@wfu.edu", "", TimePoint1$WFUUsername, ignore.case=TRUE)
+TimePoint1$WFUUsername <- gsub("@wfu", "", TimePoint1$WFUUsername, ignore.case=TRUE)
+TimePoint2$WFUUsername <- gsub("@wfu.edu", "", TimePoint2$WFUUsername, ignore.case=TRUE)
+TimePoint2$WFUUsername <- gsub("@wfu", "", TimePoint2$WFUUsername, ignore.case=TRUE)
+TimePoint3$WFUUsername <- gsub("@wfu.edu", "", TimePoint3$WFUUsername, ignore.case=TRUE)
+TimePoint3$WFUUsername <- gsub("@wfu", "", TimePoint3$WFUUsername, ignore.case=TRUE)
+TimePoint4$WFUUsername <- gsub("@wfu.edu", "", TimePoint4$WFUUsername, ignore.case=TRUE)
+TimePoint4$WFUUsername <- gsub("@wfu", "", TimePoint4$WFUUsername, ignore.case=TRUE)
+```
+
+
+```{r echo=FALSE}
+TimePoint2$WFUUsername <- gsub("Ludan Gbaye", "gbayl16", TimePoint2$WFUUsername, ignore.case=TRUE)
+TimePoint2$WFUUsername <- gsub("06527481", "markrc17", TimePoint2$WFUUsername)
+TimePoint4$WFUUsername <- gsub("06507825", "bergak16", TimePoint4$WFUUsername)
+```
+
+Then I converted all WFU Usernames to lower case only. 
+
+```{r}
+TimePoint1$WFUUsername <- tolower(TimePoint1$WFUUsername)
+TimePoint2$WFUUsername <- tolower(TimePoint2$WFUUsername)
+TimePoint3$WFUUsername <- tolower(TimePoint3$WFUUsername)
+TimePoint4$WFUUsername <- tolower(TimePoint4$WFUUsername)
+```
+
+Then I calculated autonomous motivation scores for each time point. This is the main dependent variable in the study. It is a composite of four ratings that captures the degree to which people are pursuing a goal (in this case, doing well in the course) for themselves (i.e. because they want to do well and value doing well) rather than for external causes. 
+```{r}
+TimePoint1$AutonomousMotivation <- ((TimePoint1$Motivation_3 + TimePoint1$Motivation_4) - (TimePoint1$Motivation_1 + TimePoint1$Motivation_2))
+TimePoint2$AutonomousMotivation <- ((TimePoint2$Motivation_3 + TimePoint2$Motivation_4) - (TimePoint2$Motivation_1 + TimePoint2$Motivation_2))
+TimePoint3$AutonomousMotivation <- ((TimePoint3$Motivation_3 + TimePoint3$Motivation_4) - (TimePoint3$Motivation_1 + TimePoint3$Motivation_2))
+TimePoint4$AutonomousMotivation <- ((TimePoint4$Motivation_3 + TimePoint4$Motivation_4) - (TimePoint4$Motivation_1 + TimePoint4$Motivation_2))
+```
+
+Then I cleaned up the time point data frames to include only the data of interest. 
+```{r}
+TimePoint1 <- subset(TimePoint1, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+TimePoint2 <- subset(TimePoint2, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+TimePoint3 <- subset(TimePoint3, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+TimePoint4 <- subset(TimePoint4, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+```
+
+
+Then I created new data frames to represent the previous week's data for each time point. 
+```{r}
+LastTimePointNames <- c("WFUUsername", "HowChallengingLastTimePoint", "DoWellLastTimePoint", "ActiveParticipantLastTimePoint", "BigPictureLastTimePoint", "GoodRapportLastTimePoint", "Motivation_1LastTimePoint", "Motivation_2LastTimePoint", "Motivation_3LastTimePoint", "Motivation_4LastTimePoint", "AutonomousMotivationLastTimePoint")
+TimePoint2LastWeek <- subset(TimePoint1, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+names(TimePoint2LastWeek) <- LastTimePointNames
+TimePoint3LastWeek <- subset(TimePoint2, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+names(TimePoint3LastWeek) <- LastTimePointNames
+TimePoint4LastWeek <- subset(TimePoint3, select=c("WFUUsername", "HowChallenging", "DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation"))
+names(TimePoint4LastWeek) <- LastTimePointNames
+```
+
+Then I combined each week's data with that of the previous week to allow for time-lagged analyses. 
+```{r}
+
+TimePoint2 <- left_join(TimePoint2, TimePoint2LastWeek)
+TimePoint3 <- left_join(TimePoint3, TimePoint3LastWeek)
+TimePoint4 <- left_join(TimePoint4, TimePoint4LastWeek)
 
 ```
 
@@ -151,47 +228,80 @@ Next, I added a variable to each data frame labeling it with its appropriate tim
 TimePoint1$TimePoint <- 1
 TimePoint2$TimePoint <- 2
 TimePoint3$TimePoint <- 3
+TimePoint4$TimePoint <- 4
 ```
 
-Then I combined the data frames from each time point into a master data frame, but selecting only the variables of interest. 
-
+Then I combined the data frames from each time point into two master data frames. One contains the lagged data and only includes time points after the first (for which there is no prior time point). The other contains all time points and does not include data from previous time points to allow for time-lagged analyses.
 ```{r}
-listOfTimePointDFs <- list(TimePoint1, TimePoint2, TimePoint3)
-CompiledClassroomMotivationDataset <- do.call(rbind, lapply(listOfTimePointDFs, subset, select=c("WFUUsername", "HowChallenging","DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "TimePoint")))
+CompiledClassroomMotivationDatasetWithLaggedData <- do.call("rbind", list(TimePoint2, TimePoint3, TimePoint4))
+
+listOfTimePointDFs <- list(TimePoint1, TimePoint2, TimePoint3, TimePoint4)
+CompiledClassroomMotivationDataset <- do.call(rbind, lapply(listOfTimePointDFs, subset, select=c("WFUUsername", "HowChallenging","DoWell", "ActiveParticipant", "BigPicture", "GoodRapport", "Motivation_1", "Motivation_2", "Motivation_3", "Motivation_4", "AutonomousMotivation", "TimePoint")))
 ```
 
-Some students included "@wfu.edu" or "@wfu" in their WFUUsernames even though instructed not to. So I deleted such text from the data frame. 
+I need to anonymize the WFUUsername data. Mike helped me set up this code below to create unique numerical IDs for each unique WFU Username in my data set. Then he mentioned I would want to do a left join to incorporate the IDs into my primary data frame. Here's the code Mike wrote: 
+```{r eval=FALSE}
 
-```{r}
-CompiledClassroomMotivationDataset$WFUUsername <- gsub("@wfu.edu", "", CompiledClassroomMotivationDataset$WFUUsername, ignore.case=TRUE)
-CompiledClassroomMotivationDataset$WFUUsername <- gsub("@wfu", "", CompiledClassroomMotivationDataset$WFUUsername, ignore.case=TRUE)
-```
-
-```{r echo=FALSE}
-CompiledClassroomMotivationDataset$WFUUsername <- gsub("Ludan Gbaye", "gbayl16", CompiledClassroomMotivationDataset$WFUUsername, ignore.case=TRUE)
-CompiledClassroomMotivationDataset$WFUUsername <- gsub("06527481", "markrc17", CompiledClassroomMotivationDataset$WFUUsername)
+CompiledClassroomMotivationDataset %>% 
+  select(WFUUsername) %>% mutate(WFUUsername=tolower(WFUUsername)) %>% 
+  unique() %>% mutate(MyID=row_number())
 
 ```
 
-I then calculated an autonomous motivation score from participants' responses. This is the main dependent variable in the study. It is a composite of four ratings that captures the degree to which people are pursuing a goal (in this case, doing well in the course) for themselves (i.e. because they want to do well and value doing well) rather than for external causes. 
-
-```{r}
-CompiledClassroomMotivationDataset$AutonomousMotivation <- ((CompiledClassroomMotivationDataset$Motivation_3 + CompiledClassroomMotivationDataset$Motivation_4) - (CompiledClassroomMotivationDataset$Motivation_1 + CompiledClassroomMotivationDataset$Motivation_2))
-```
-
-To do: 
-I still need to anonymize the data set by replacing students' WFU usernames with numerical codes. I will then be ready to analyze my data using the lme4 package. 
-
-## Session 7
-
-I realized that I want to do some time-lagged analyses in my project, meaning I want to test whether students' motivations at one time point are predicted by their perceptions and experiences of the course at the most recent time point (or, vice versa, whether students' experiences and perceptions at one time point are predicted by their motivations at the most recent time point). To do this, I need to add data to my data frame. Currently, each row in the data frame contains participants' responses during a single time point. I need to include in each row participants' responses at the most recent time point as well. 
-
+I rewrote the code and now have this, which allows me to change WFUUsername to all lower case (correcting for the fact that some students capitalized the first letter of their user names) and then to create unique participant ID numbers for each student: 
 ```{r}
 
+CompiledClassroomMotivationDataset <- left_join(CompiledClassroomMotivationDataset, CompiledClassroomMotivationDataset %>% select(WFUUsername) %>% unique() %>% mutate(ParticipantID=row_number()))
+CompiledClassroomMotivationDataset$WFUUsername <- NULL
+
+CompiledClassroomMotivationDatasetWithLaggedData <- left_join(CompiledClassroomMotivationDatasetWithLaggedData, CompiledClassroomMotivationDatasetWithLaggedData %>% select(WFUUsername) %>% unique() %>% mutate(ParticipantID=row_number()))
+CompiledClassroomMotivationDatasetWithLaggedData$WFUUsername <- NULL
+
+```
+
+I'm ready to analyze my data! First, some visualizations. 
+```{r}
+ggplot (CompiledClassroomMotivationDataset, aes(x = factor(TimePoint), y = HowChallenging)) + geom_violin()
+ggplot (CompiledClassroomMotivationDataset, aes(x = factor(TimePoint), y = DoWell)) + geom_violin()
+ggplot (CompiledClassroomMotivationDataset, aes(x = factor(TimePoint), y = ActiveParticipant)) + geom_violin()
+ggplot (CompiledClassroomMotivationDataset, aes(x = factor(TimePoint), y = BigPicture)) + geom_violin()
+ggplot (CompiledClassroomMotivationDataset, aes(x = factor(TimePoint), y = GoodRapport)) + geom_violin()
+ggplot (CompiledClassroomMotivationDataset, aes(x = factor(TimePoint), y = AutonomousMotivation)) + geom_violin()
 ```
 
 
-## Session 8
+Next, some mixed models testing the relationship between the various ratings and autonomous motivation. 
+```{r}
+
+library(lme4)
+library(lmerTest)
+
+HowChallengingOverTime = lmer(HowChallenging ~ TimePoint + (1 | ParticipantID), data=CompiledClassroomMotivationDataset)
+
+DoWellOverTime = lmer(DoWell ~ TimePoint + (1 | ParticipantID), data=CompiledClassroomMotivationDataset)
+
+ActiveParticipantOverTime = lmer(ActiveParticipant ~ TimePoint + (1 | ParticipantID), data=CompiledClassroomMotivationDataset)
+
+BigPictureOverTime = lmer(BigPicture ~ TimePoint + (1 | ParticipantID), data=CompiledClassroomMotivationDataset)
+
+GoodRapportOverTime = lmer(GoodRapport ~ TimePoint + (1 | ParticipantID), data=CompiledClassroomMotivationDataset)
+
+AutonomousMotivationOverTime = lmer(AutonomousMotivation ~ TimePoint + (1 | ParticipantID), data=CompiledClassroomMotivationDataset)
+
+autonomousMotivationModel = lmer(AutonomousMotivation ~ HowChallenging + DoWell + ActiveParticipant + BigPicture  + GoodRapport + (1 | ParticipantID) + (1 | TimePoint), data=CompiledClassroomMotivationDataset)
+
+autonomousMotivationModel = lmer(AutonomousMotivation ~ HowChallenging + DoWell + ActiveParticipant + BigPicture  + GoodRapport + AutonomousMotivationLastTimePoint + (1 | ParticipantID) + (1 | TimePoint), data=CompiledClassroomMotivationDatasetWithLaggedData)
+
+autonomousMotivationModel = lmer(AutonomousMotivation ~ HowChallengingLastTimePoint + DoWellLastTimePoint + ActiveParticipantLastTimePoint + BigPictureLastTimePoint  + GoodRapportLastTimePoint + AutonomousMotivationLastTimePoint + (1 | ParticipantID) + (1 | TimePoint), data=CompiledClassroomMotivationDatasetWithLaggedData)
+
+autonomousMotivationModel = lmer(AutonomousMotivation ~ HowChallengingChange + DoWellChange + ActiveParticipantChange + BigPictureChange  + GoodRapportChange + AutonomousMotivationLastTimePoint + (1 | ParticipantID) + (1 | TimePoint), data=CompiledClassroomMotivationDatasetWithLaggedData)
+
+autonomousMotivationModel = lmer(AutonomousMotivation ~  BigPictureLastTimePoint + AutonomousMotivationLastTimePoint + (1 | ParticipantID) + (1 | TimePoint), data=CompiledClassroomMotivationDatasetWithLaggedData)
+
+bigPictureModel = lmer(BigPicture ~ BigPictureLastTimePoint + AutonomousMotivationLastTimePoint + (1 | ParticipantID) + (1 | TimePoint), data=CompiledClassroomMotivationDatasetWithLaggedData)
+
+```
+
 
 ----
 
