@@ -6,7 +6,7 @@ bibliography: library.bib
 ```{r, child="_setup.Rmd"}
 ```
 
-```{r echo=FALSE}
+```{r include=FALSE}
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
@@ -164,7 +164,7 @@ CompiledClassroomMotivationDatasetWithLaggedData$WFUUsername <- NULL
 
 ```
 
-```{r echo=FALSE}
+```{r include=FALSE}
 library(lme4)
 library(lmerTest)
 library(stats)
